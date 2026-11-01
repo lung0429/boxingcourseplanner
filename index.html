@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boxing Lab v4.3 · 拳學會訓練系統</title>
+<style>
+:root{--bg:#0f1115;--card:#181b22;--line:#2a2f3a;--tx:#e9ebf0;--mu:#9aa3b2;--red:#e5383b;--gold:#f5b942;--ok:#3ecf8e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 -apple-system,"Segoe UI","PingFang HK","PingFang TC","Microsoft JhengHei","Noto Sans TC","Noto Sans CJK TC",sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+header{padding:28px 0 12px;border-bottom:2px solid var(--red);margin-bottom:20px}
+header h1{margin:0;font-size:30px;letter-spacing:2px}header h1 span{color:var(--red)}
+header p{margin:4px 0 0;color:var(--mu)}
+h2{font-size:18px;margin:26px 0 10px;border-left:4px solid var(--red);padding-left:10px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label.f{display:flex;flex-direction:column;font-size:13px;color:var(--mu);gap:4px}
+input,select,button{font:inherit;color:var(--tx);background:#10131a;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+button{cursor:pointer;background:var(--red);border-color:var(--red);font-weight:600}
+button.ghost{background:transparent;border-color:var(--line);color:var(--mu)}
+button:hover{filter:brightness(1.12)}
+.cats{margin:12px 0;display:grid;gap:10px}
+.cat{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#13161d}
+.cathead{font-weight:700;margin-bottom:6px}
+.cathead b{display:inline-block;min-width:22px;text-align:center;background:var(--red);border-radius:5px;margin-right:8px;font-size:13px}
+.cathead small{color:var(--mu);font-weight:400;margin-left:8px}
+.catgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.catgrid label{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;background:#10131a}
+.catgrid label.is-selected{border-color:var(--red);background:#2a1517}
+.catgrid label.is-disabled{opacity:.4;cursor:not-allowed}
+.catgrid small{color:var(--mu);margin-left:auto}
+.note{color:var(--mu);font-size:13px;margin:4px 0}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.warn{background:#2b2210;border:1px solid #6b5217;color:var(--gold);padding:8px 12px;border-radius:8px;margin:6px 0;font-size:14px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.stat{background:#10131a;border:1px solid var(--line);border-radius:10px;padding:8px 14px}
+.stat b{display:block;font-size:20px;color:var(--gold)}
+.strip{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:10px 0 16px}
+.strip i{display:block;height:100%}
+details.card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden}
+details.card summary{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;list-style:none}
+details.card summary::-webkit-details-marker{display:none}
+.no{color:var(--red);font-weight:800;font-size:20px}
+.tt{flex:1;font-weight:700}.tt small{display:block;color:var(--mu);font-weight:400;font-size:11px;letter-spacing:1px}
+.tm{color:var(--mu);font-size:13px}
+.body{padding:4px 16px 14px;border-top:1px solid var(--line)}
+ul.rows{list-style:none;padding:0;margin:8px 0}
+ul.rows li{display:flex;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line)}
+ul.rows li b{min-width:76px;color:var(--gold);font-weight:600}
+.cue{background:#10131a;border-left:3px solid var(--red);padding:8px 12px;border-radius:6px;margin:10px 0 4px}
+.rot{background:#10131a;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:14px}
+.lv{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin-top:8px}
+.lv div{background:#10131a;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px}
+.lv em{color:var(--ok);font-style:normal;font-weight:600;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#10131a;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px}
+.fb{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.fb span{min-width:110px;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+footer{margin-top:40px;color:var(--mu);font-size:12px;text-align:center}
+noscript{display:block;background:#2b2210;color:var(--gold);padding:12px;text-align:center}
+@media print{
+body{background:#fff;color:#000}.panel,details.card,.rot,.lv div,.stat,.cue{background:#fff!important;border-color:#bbb!important;color:#000!important}
+.no-print,#builderWrap,.fbWrap{display:none!important}.tm,.note,.tt small{color:#444!important}.tt,ul.rows li b{color:#000!important}
+header{border-color:#000}
+}
+</style>
+</head>
+<body>
+<noscript>此頁面需要啟用 JavaScript 才能生成課表。</noscript>
+<div class="wrap">
+<header>
+<h1>BOXING <span>LAB</span> v4.3</h1>
+<p>大學拳學會 · 非接觸基礎訓練課表生成器(單一檔案,離線可用)· 16 個技術主題</p>
+</header>
+<section id="builderWrap" class="no-print">
+<h2>01 課堂設定</h2>
+<form id="builder" class="panel">
+<label class="f" style="margin-bottom:10px">快速套用 9 週課程<select id="week"></select></label>
+<div class="note">按類別選擇 1–2 項技術。建議搭配:基礎或移動 + 進攻,或進攻 + 防守;L1–L3 是難度,前置技術未掌握時會自動加入重溫。</div>
+<div id="topics" class="cats"></div>
+<div id="selection-note" class="note"></div>
+<div class="grid">
+<label class="f">人數(5–20)<input id="people" type="number" min="5" max="20" value="12"></label>
+<label class="f">教練人數<select id="coaches"><option value="1">1</option><option value="2">2</option></select></label>
+<label class="f">程度<select id="level"><option value="beginner">初學者</option><option value="mixed" selected>混合程度</option><option value="experienced">有經驗</option></select></label>
+<label class="f">時長<select id="duration"><option value="60">60 分鐘</option><option value="90" selected>90 分鐘</option></select></label>
+<label class="f">變化種子(換數字=換花樣)<input id="seed" type="number" min="1" max="999" value="1"></label>
+</div>
+<details style="margin-top:12px"><summary class="note" style="cursor:pointer">已掌握的技術(用於前置檢查,可手動修改)</summary>
+<div id="learned" class="cats"></div></details>
+<div class="actions">
+<button type="submit">生成課表</button>
+<button type="button" id="print" class="ghost">列印 / 另存 PDF</button>
+<button type="button" id="export" class="ghost">匯出學習記錄</button>
+<button type="button" id="importBtn" class="ghost">匯入學習記錄</button>
+<input type="file" id="importFile" accept=".json,application/json" style="display:none">
+<button type="button" id="selftest" class="ghost">自我測試</button>
+<button type="button" id="reset" class="ghost">清除學習記錄</button>
+</div>
+<div id="storage-note" class="note"></div>
+<div id="testout" class="note"></div>
+</form>
+</section>
+<section id="out">
+<h2 style="margin-top:30px">02 <span id="plan-title"></span></h2>
+<div class="stats">
+<div class="stat">總時長<b><span id="total-duration"></span> 分鐘</b></div>
+<div class="stat">手靶分組<b id="group-count"></b></div>
+<div class="stat">本堂週次<b id="week-label"></b></div>
+<div class="stat">技術類別<b id="cat-label"></b></div>
+</div>
+<p id="summary" class="note"></p>
+<div id="warnings"></div>
+<p id="objective"></p>
+<div id="strip" class="strip"></div>
+<div id="timeline"></div>
+<h2>03 人員與分組</h2>
+<div class="panel"><p id="staffing" style="margin-top:0"></p><div id="groups"></div></div>
+<section class="fbWrap">
+<h2>04 課後回饋(決定下一堂難度)</h2>
+<div class="panel"><div id="feedback"></div>
+<div class="note">通過率 ≥80% 下堂升一級並標記為已掌握;60–79% 維持;&lt;60% 降一級。記錄存於本機瀏覽器;換電腦請用「匯出／匯入學習記錄」。</div>
+<div id="fbmsg" class="note"></div></div>
+<h2>近期記錄</h2>
+<div class="panel" id="history"></div>
+</section>
+</section>
+<footer>Boxing Lab v4.3 · 所有練習為非接觸;持靶者不向頭部拍靶;身體不適請停止並告知教練。</footer>
+</div>
+<script>
+/*CORE_START*/
+const CATS={
+A:{label:'基礎',en:'FOUNDATION',desc:'姿勢與平衡,所有課堂的前置條件'},
+B:{label:'移動',en:'MOVEMENT',desc:'步法、轉身與距離控制'},
+C:{label:'進攻',en:'OFFENCE',desc:'各種拳法(沙包與手靶,非接觸)'},
+D:{label:'防守',en:'DEFENCE',desc:'回防與閃避(口令模擬,不對真實來拳)'},
+E:{label:'應用',en:'APPLICATION',desc:'把前面技能連接起來,需先掌握前置技術'}
+};
+const LIB={
+stance:{name:'站姿與護手',icon:'△',cat:'A',lv:1,prereq:[],
+goal:'建立前後腳站距、膝部放鬆、雙手護臉的穩定基本站姿。',
+warm:'踝、髖活動與慢速站姿切換;同伴互相觀察站距。',
+demo:'示範前後腳站距略寬於肩、前腳掌朝前、後腳跟微提起、膝微屈;下巴微收、雙拳靠近下巴、手肘貼近肋骨。說明慣用手同側的腳在後。',
+cue:'站距不要太窄或成一直線;肩膀放鬆,拳不要掉到胸前。',
+bag:['站好後以前手輕觸沙包檢查距離,收手回護手','站姿下輕打單發前手直拳,收手後檢查護手位置','護手站姿下小步前後,停穩後輕觸沙包再收手'],
+pads:['持靶者固定,學員站好後輕觸靶面再收手','聽口令「站、停」,每次停穩檢查護手','小步進退後輕打前手直拳,停穩並保持護手'],
+basic:'只做不出拳的站姿搭建與檢查,搭檔輪流觀察站距。',advanced:'出拳或移動後,不看鏡也能回到正確站姿。',
+fitness:['徒手深蹲','提踵','靠牆靜蹲(短時間)','原地小步'],
+check:'搭檔檢查5次站姿重設,至少4次站距、護手與膝部位置正確。'},
+balance:{name:'重心與平衡',icon:'⚖',cat:'A',lv:1,prereq:['stance'],
+goal:'學會前後腳重心轉移,出拳或移動後能停穩,不前傾追拳。',
+warm:'慢速重心前後轉移、單腳站立片刻及踝部活動。',
+demo:'示範重心約在雙腳之間偏後腳;出拳時重心微移前腳,收拳後回原位。用「停2秒」檢查是否平衡。',
+cue:'頭不超前於前膝;每次動作後可以停住2秒而不補步。',
+bag:['站穩後輕打前手直拳,收手停穩2秒','單發後手直拳,轉髖後回原站姿並停穩','一步移動後單發直拳,檢查重心不前傾'],
+pads:['固定靶位,前手直拳後保持站姿','聽「停」口令,出拳後停穩2秒','小步進退後輕打前手直拳,停穩護手'],
+basic:'先不出拳,只做重心轉移與停穩;能停住後再加單發直拳。',advanced:'移動後出雙直拳,停穩時雙手仍保持護手。',
+fitness:['單腳站立(可扶牆)','徒手深蹲','鳥狗式','提踵'],
+check:'5次停頓檢查中至少4次不需補步便能站穩。'},
+fwd:{name:'前後步',icon:'⇅',cat:'B',lv:1,prereq:['stance'],
+goal:'掌握前進與後退步法,移動後保持站距並回到站姿。',
+warm:'踝關節活動、提踵與前後小步;同伴輪流領路做無接觸鏡像遊戲。',
+demo:'示範前進先動前腳、後腳跟上;後退先動後腳、前腳跟上。每步小而快,站距保持不變。',
+cue:'腳不併攏、不交叉;每步後立即回到站姿,不彈跳過高。',
+bag:['前進至合適距離—前手直拳—退回','前進一步—前手直拳—後退一步並重設','前後步配合前手—後手直拳;在自己的沙包區內移動'],
+pads:['持靶者固定,學員進步站穩打前手直拳再退','持靶者慢速前後移位,學員跟步重設後才打拳','口令指定前進或後退,移動後出前手—後手直拳'],
+basic:'先不出拳,只做前進與後退各5步,保持站距。',advanced:'前後兩個方向連接移動,站穩後接雙直拳。',
+fitness:['提踵','徒手深蹲','前後小步','鳥狗式'],
+check:'連續5次前後移動中,至少4次站距不變、腳不交叉,停下可立即護手。'},
+side:{name:'左右側步',icon:'⇆',cat:'B',lv:1,prereq:['stance'],
+goal:'掌握向左、向右側步,移動後保持面向及站距。',
+warm:'踝、髖活動與側向小步;同伴做無接觸的側步鏡像遊戲。',
+demo:'示範向左側步先動左腳、右腳跟上;向右先動右腳、左腳跟上。腳不交叉。',
+cue:'側步時膝部放鬆,雙腳不併攏;保持面向目標,不轉背。',
+bag:['向左側移一步,重設後輕打前手直拳','向右側移一步,重設後輕打前手直拳','口令指定左或右,移動後出前手—後手直拳,在自己的沙包區內'],
+pads:['持靶者固定,學員側移一步重設再打前手直拳','持靶者慢速側移,學員跟步重設後才打拳','口令指定左右,移動後出前手—後手直拳'],
+basic:'不出拳,只做左右各5步,保持站距與面向。',advanced:'左右連接移動,站穩後接雙直拳,保持距離。',
+fitness:['左右側步觸點','側向小步','徒手深蹲','提踵'],
+check:'連續5次左右移動中,至少4次不交叉腳、站距穩定、仍面向目標。'},
+pivot:{name:'轉身 Pivot',icon:'↻',cat:'B',lv:2,prereq:['stance','side'],
+goal:'以前腳掌為軸做小幅轉身,改變角度後回到穩定站姿。',
+warm:'踝、髖活動及慢速前腳掌轉動;同伴保持距離做無接觸轉向遊戲。',
+demo:'示範以前腳掌為軸,後腳小步帶動身體轉約45度,轉完立即站穩護手。先無出拳,再接單發直拳。',
+cue:'轉幅小;重心不跟著甩;轉完腳掌站穩、膝部放鬆。',
+bag:['以前腳為軸小幅轉向,面向沙包後站穩','轉向後輕打前手直拳,收手重設','側移一步—轉向—前手直拳,在自己的沙包區內'],
+pads:['持靶者固定,學員轉向站穩後打前手直拳','持靶者慢速移位,學員轉向重設後才打拳','口令指定轉向方向,站穩後出前手—後手直拳'],
+basic:'不出拳,慢速轉向並停穩,左右各5次。',advanced:'側步加轉向後出雙直拳,保持距離與護手。',
+fitness:['徒手深蹲','提踵','鳥狗式','死蟲式核心'],
+check:'5次轉向中至少4次轉完能停穩、護手仍在原位,不出現交叉腳。'},
+distance:{name:'距離與節奏',icon:'↔',cat:'B',lv:2,prereq:['fwd','side','jab'],
+goal:'辨認有效擊打距離,學會進入、停頓及退出。',
+warm:'同伴保持安全距離做快慢鏡像步法,每分鐘換領路者。',
+demo:'示範不前傾的直拳距離;用小步調距,以慢—停—快口令改變節奏。',
+cue:'距離不足時先移步,不伸頭追靶;快慢改變仍要保持站姿。',
+bag:['從包外小步進入,單發前手直拳後退','前手直拳—停頓—前手直拳','以慢—停—快節奏打雙直拳,完成後退出'],
+pads:['持靶者固定,學員找距離後單發直拳','持靶者小步移位,學員重設距離再出拳','按慢、停、快口令完成雙直拳'],
+basic:'固定靶位,先學進入與退出,不加快節奏。',advanced:'持靶者慢速改變距離;學員自行判斷時機,避免追靶。',
+fitness:['側向小步','提踵','徒手深蹲','鳥狗式'],
+check:'5次進入距離中至少4次不需前傾便可擊靶及退出。'},
+jab:{name:'前手直拳 Jab',icon:'↗',cat:'C',lv:1,prereq:['stance'],
+goal:'建立穩定的前手直拳,出拳後沿原路收回並保持護手。',
+warm:'肩胛活動、胸椎轉動與輕鬆前後步;最後以慢速前手直拳空擊。',
+demo:'示範前手直拳:拳從護手位置直線伸出,出拳時前腳掌微轉,伸直前手腕與前臂對齊,後手留在下巴旁,之後原路收回。',
+cue:'肩放鬆,先出拳後出力;手肘不鎖死;收拳速度不慢於出拳。',
+bag:['單發前手直拳,找穩距離','連續兩次前手直拳,每次收手護手','前手直拳—後退一步重設'],
+pads:['固定靶位:單發前手直拳','持靶者口令起動:前手直拳','前手直拳—後退;持靶者重設距離'],
+basic:'以慢速單發空擊開始,逐步輕打沙包或靶。',advanced:'雙前手直拳,配合進步與退步;每組不超過三拳。',
+fitness:['椅式深蹲','斜板掌上壓','死蟲式核心','原地快速小步'],
+check:'搭檔觀察連續5組前手直拳,至少4組出拳後護手回位、身體保持平衡。'},
+cross:{name:'後手直拳 Cross',icon:'⇗',cat:'C',lv:1,prereq:['stance','jab'],
+goal:'建立由後腳、髖部帶動的後手直拳,出拳後回到站姿。',
+warm:'肩胛、胸椎與髖部轉動;慢速空擊前手直拳後接後手直拳。',
+demo:'示範後腳掌轉動、髖部轉向、肩帶動後手直線伸出;前手留在下巴旁護臉;收拳後髖部轉回。強調由下而上傳力,不是只出手臂。',
+cue:'髖先轉、手後到;後手回收到下巴旁;重心不衝前。',
+bag:['單發後手直拳,轉髖後回原站姿','前手—後手直拳,打完回防','前手—後手直拳—後退一步重設'],
+pads:['固定靶位:單發後手直拳','前手—後手直拳,持靶者口令起動','前手—後手直拳後退;持靶者重設距離'],
+basic:'慢速單發後手直拳,先確認髖部與腳掌轉動,再輕打。',advanced:'前手—後手直拳加進步與退步,每組不超過三拳。',
+fitness:['徒手深蹲','死蟲式核心','斜板掌上壓','原地小步'],
+check:'搭檔觀察5組後手直拳,至少4組髖部轉動、前手護臉、打完能停穩。'},
+hook:{name:'平勾拳',icon:'↶',cat:'C',lv:3,prereq:['jab','cross'],
+goal:'掌握近至中距離前手平勾拳,以身體轉動帶拳並保持平衡。',
+warm:'肩胛與髖部活動、腳掌小幅轉動;以低速無負重轉體配合步法。',
+demo:'先重溫站姿與直拳,示範前手平勾拳的距離、屈肘角度和髖肩協調;以小幅轉動完成出拳。',
+cue:'手腕保持中立、拳與前臂對齊;避免只甩手臂或過度扭膝,另一手保持防守。',
+bag:['低力度單發前手平勾拳','前手直拳後重設,再打前手平勾拳','後手直拳—前手平勾拳,完成後回防'],
+pads:['持靶者先固定適合平勾拳的靶面,單發練習','前手直拳與平勾拳分開練距離','後手直拳—前手平勾拳,慢速連接'],
+basic:'只做單發前手平勾拳;縮小轉幅,教練確認手腕與距離後才加組合。',advanced:'前手—後手直拳—前手平勾拳,完成後側移重設;追求穩定而非力道。',
+fitness:['徒手深蹲','鳥狗式','左右側棒式(中途換邊)','低衝擊開合步'],
+check:'搭檔觀察5次勾拳,至少4次手腕對齊、打完能停穩且另一手守臉。'},
+uppercut:{name:'上勾拳',icon:'↑',cat:'C',lv:3,prereq:['jab','cross'],
+goal:'學習短距離上勾拳,以腿髖協調帶動,避免向後甩手。',
+warm:'肩胛活動、微屈膝伸展及低速髖部轉動。',
+demo:'示範前手上勾拳的短路徑,拳由護手位置上送;先空擊,再由教練確認靶位。',
+cue:'不大幅蹲低或向後拉手;手腕中立,另一手守臉。普通直筒沙包沒有合適斜面時,上勾拳改空擊,不硬撞包底。',
+bag:['前手上勾拳空擊2次,再以輕直拳打包檢查距離','上勾拳空擊後回防,再打前手直拳','上勾拳空擊—重設—雙直拳打包'],
+pads:['教練調整向下的靶面,低力單發前手上勾拳','前手上勾拳後停穩回防','前手上勾拳—重設—後手直拳'],
+basic:'小幅空擊,教練確認路徑與持靶能力後才輕打靶。',advanced:'短距離上勾拳後重設,再接後手直拳,控制幅度。',
+fitness:['徒手深蹲','鳥狗式','死蟲式核心','低衝擊開合步'],
+check:'5次上勾拳中至少4次沒有大幅拉手,打完能回防。'},
+body:{name:'打身(身體拳)',icon:'▽',cat:'C',lv:3,prereq:['jab','cross'],
+goal:'學會以屈膝降低重心的方式向腰部高度目標出拳,不彎腰、不低頭。',
+warm:'髖、膝與踝活動,慢速屈膝—伸膝配合護手。',
+demo:'示範屈膝降低高度後出前手直拳至腰部高度的目標,背部保持挺直、眼望前方;說明為何不彎腰(失去平衡及視野)。',
+cue:'降低的是膝而不是腰;頭保持在兩手之間;出拳後立即升回站姿。',
+bag:['屈膝空擊,再輕打沙包中下部的前手直拳','前手直拳(頭)—屈膝前手直拳(身)—回防','後手直拳(身)—回站姿,打完護手'],
+pads:['持靶者將靶放在腰部高度,學員屈膝單發前手直拳','持靶者交替靶位高低,學員按位置調整高度','前手直拳—屈膝後手直拳,慢速連接,持靶者不向頭部拍靶'],
+basic:'先做不出拳的屈膝—回升,確認背直與眼望前方;再加單發前手直拳。',advanced:'頭部與身體目標交替的雙直拳,每次回升後護手。',
+fitness:['徒手深蹲','靠牆靜蹲(短時間)','死蟲式核心','鳥狗式'],
+check:'5次打身動作中至少4次背部挺直、不低頭、出拳後回到站姿。'},
+guard:{name:'回防與護手',icon:'◈',cat:'D',lv:1,prereq:['stance'],
+goal:'養成每次出拳後立即回到護手位置的習慣,並學會原地基本護手。',
+warm:'肩胛活動、輕鬆側步及同伴無接觸反應遊戲。',
+demo:'示範高位護手:雙拳靠近下巴、肘貼肋;出拳後手回到同一位置。以口令「回」練習反射式回防;不向學員頭部出拳。',
+cue:'眼望前方不閉眼;回防速度要快於出拳;拳不要掉到胸前。',
+bag:['前手直拳後立即回防','前手—後手直拳後立即回防','聽「回」口令,隨時停手回到護手'],
+pads:['出示靶位才打前手直拳,收靶即回防','前手—後手直拳,收靶即回防','聽「回」口令,在任何時刻回到護手'],
+basic:'無出拳練習,聽口令在1秒內回到護手。',advanced:'連續兩至三拳後以口令回防,每次回位都檢查位置。',
+fitness:['側向小步','死蟲式核心','斜板掌上壓','原地小步'],
+check:'5次口令中至少4次在約1秒內回到護手,拳靠近下巴、眼望前方。'},
+backstep:{name:'後退避開',icon:'⇤',cat:'D',lv:2,prereq:['guard','fwd'],
+goal:'學會以後退步改變距離避開直線,站穩後回到護手(口令模擬)。',
+warm:'後退小步、踝髖活動;同伴保持一臂以外距離,以手勢做無接觸反應遊戲。',
+demo:'示範聽到口令「退」後,後腳先動、前腳跟上退一小步,保持護手與站距;同伴不出拳,只以口令或手勢模擬來拳。',
+cue:'退一步就夠,不連退;重心不後仰;退完雙手仍護臉。',
+bag:['前手直拳—後退一步—回防','前手—後手直拳—後退一步重設','按口令「退」後退,站穩後打前手直拳'],
+pads:['出示靶位才打前手直拳,收靶即聽口令後退','前手—後手直拳後,按口令退步','隨機口令「打」或「退」,按口令動作'],
+basic:'無出拳,按固定口令退一步並站穩。',advanced:'持靶者隨機喊「退」,學員退步站穩後才反應。',
+fitness:['交替後撤弓步(可縮幅)','提踵','死蟲式核心','側向小步'],
+check:'5次口令中至少4次一步退開、站距不變、護手仍在。'},
+slip:{name:'側閃',icon:'⤸',cat:'D',lv:2,prereq:['guard','side'],
+goal:'學會小幅側閃的身體動作與重設(口令模擬,不對真實來拳)。',
+warm:'髖、膝與踝活動;慢速左右重心轉移與微屈膝。',
+demo:'示範微屈膝帶動身體向側邊移約半個頭寬,眼睛保持望前方,然後回正。先慢速無出拳,再接單發直拳。同伴只以口令模擬,不向頭部出拳。',
+cue:'動作小,由膝帶動而非彎腰;眼不閉;閃完立刻回到中線。',
+bag:['按口令向左或右小幅側閃,站穩後輕打前手直拳','前手直拳—小幅側閃—重設;不以擺動沙包撞身','隨機口令側閃後打雙直拳,在自己的沙包區內'],
+pads:['按左右口令側閃,站穩後才出前手直拳','持靶者出示靶位前先給口令,側閃後出拳','隨機左右口令,完成後出示雙直拳靶位'],
+basic:'慢速無出拳側閃,先確認屈膝與眼望前方。',advanced:'隨機左右口令,側閃—重設—反應出拳。',
+fitness:['徒手深蹲','左右側步觸點','鳥狗式','死蟲式核心'],
+check:'5次隨機口令中至少4次動作小、眼望前方、閃完能回正並保持護手。'},
+combo:{name:'組合拳',icon:'⇢',cat:'E',lv:3,prereq:['jab','cross','guard'],
+goal:'把已學會的拳法連接成短組合,維持節奏、呼吸和回防。',
+warm:'慢速直拳空擊,配合短呼氣與站姿重設。',
+demo:'重溫單拳,再連接前手—後手直拳;具備勾拳基礎者才加入第三拳。強調每拳之間不先收手,最後一拳後回防。',
+cue:'先準確再加速;每拳後回收,不屏息,不為追求速度失去平衡。',
+bag:['前手—後手直拳,每組後回防','雙前手直拳—後手直拳','已掌握勾拳者做雙直拳—前手勾拳,其他人維持雙直拳'],
+pads:['固定雙直拳組合,逐拳確認靶位','雙前手—後手直拳,以口令控制節奏','持靶者指定雙直拳或雙前手接後手直拳'],
+basic:'只做兩拳組合,拳與拳之間可停頓重設。',advanced:'最多三拳,加入速度變化和出拳後退步。',
+fitness:['斜板掌上壓','徒手深蹲','死蟲式核心','原地小步'],
+check:'5組組合拳中至少4組能完整回防、呼氣並站穩。'},
+counter:{name:'防守反擊',icon:'↩',cat:'E',lv:3,prereq:['backstep','slip','jab'],
+goal:'按提示完成防守,站穩後以簡單直拳回應。',
+warm:'退步與小幅側閃空擊,以手勢提示方向,不接觸頭部。',
+demo:'示範退步—重設—前手直拳;以口令模擬來拳,防守熟練後才加入反擊。',
+cue:'先保持平衡再反擊,不同時大幅後仰和出拳;持靶者不向頭部拍靶。',
+bag:['退步—進入合適距離—前手直拳','小幅側閃—重設—前手直拳','按退或閃口令防守,站穩後打雙直拳'],
+pads:['口令退步,站穩後出示前手直拳靶位','口令側閃,重設後出前手直拳','隨機退或閃口令,完成後才出示雙直拳靶位'],
+basic:'把防守及反擊分開,中間停頓,使用固定口令。',advanced:'加入隨機口令,保持防守—反擊—退出的順序。',
+fitness:['交替後撤弓步(可縮幅)','死蟲式核心','側向小步','斜板掌上壓'],
+check:'5次口令中至少4次先完成防守、站穩,再向靶位出拳。'}
+};
+const WEEKS=[['stance','balance'],['jab','fwd'],['cross','side'],['guard','pivot'],['backstep','distance'],['slip','hook'],['uppercut','body'],['combo'],['counter']];
+const STAGES=[['熱身','WARM-UP'],['技術示範與練習','DEMONSTRATION'],['沙包訓練','BAG WORK'],['手靶訓練','PAD WORK'],['體能訓練','CONDITIONING'],['同伴觀察評估','PEER CHECK'],['緩和與回顧','COOLDOWN']];
+const WARM_POOL=['跳繩或原地小步,逐步提高心率(無繩者原地小跳)','影子拳:只做已學直拳,慢速、留意回防','慢走／原地小步,逐步提高活動量','輕鬆鏡像步法,同伴保持一臂以外距離'];
+const FORMAT_POOL=['固定口令,慢速、輕力','自由節奏,但每拳後必須停穩','每30秒由持靶者／搭檔換一次口令'];
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function rng(seed){let a=(seed*2654435761)>>>0||1;return()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+function shuffle(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));const x=a[i];a[i]=a[j];a[j]=x;}return a;}
+function uniq(a){return a.filter((x,i)=>a.indexOf(x)===i);}
+function flat(a){return a.reduce((s,x)=>s.concat(x),[]);}
+function groupsFor(n,count){const g=Array.from({length:count},()=>[]);for(let i=1;i<=n;i++)g[(i-1)%count].push(i);return g;}
+function timeText(m){const s=Math.round(m*60);return Math.floor(s/60)+'分鐘'+(s%60?(s%60)+'秒':'');}
+function rotation(g,segments){const r=g<=3?6/g:1,slot=360/(g*r),rest=slot<=60?15:30,work=slot-rest;return{rounds:r,work:work,rest:rest,hitting:segments*r*work/60};}
+function missingPrereq(keys,learned){const L=learned||[];const out={};keys.forEach(k=>{const m=LIB[k].prereq.filter(p=>L.indexOf(p)<0&&keys.indexOf(p)<0);if(m.length)out[k]=m;});return out;}
+function pairAdvice(keys){
+ if(keys.length!==2)return null;
+ if(LIB[keys[0]].cat==='E'&&LIB[keys[1]].cat==='E')return '兩個應用類主題同堂,內容會過於複雜;建議改配一個基礎、移動或進攻類主題。';
+ return null;
+}
+function buildPlan(o){
+const keys=o.keys,n=o.n,coaches=o.coaches,level=o.level,duration=o.duration,seed=o.seed||1,progress=o.progress||{},learned=o.learned||[];
+if(!Array.isArray(keys)||keys.length<1||keys.length>2||uniq(keys).length!==keys.length||keys.some(k=>!LIB[k])||!Number.isInteger(n)||n<5||n>20||[60,90].indexOf(duration)<0||[1,2].indexOf(coaches)<0||['mixed','beginner','experienced'].indexOf(level)<0)throw Error('請選擇1–2項技術、5–20人及有效課堂設定。');
+const r=rng(seed*97+keys.length*13+keys.join('').length);
+const ts=keys.map(k=>Object.assign({key:k},LIB[k]));
+const long=duration===90,segments=long?3:2;
+const padGroups=groupsFor(n,Math.min(5,Math.floor(n/2))),bagGroups=groupsFor(n,Math.min(8,Math.floor(n/2)));
+const row=(minutes,text)=>({minutes:minutes,text:text});
+const base=t=>clamp((level==='experienced'?1:0)+(progress[t.key]||0),0,2);
+const idx=(t,s)=>level==='beginner'?base(t):clamp(base(t)+(s>=1?1:0),0,2);
+const tag=i=>'Lv'+(i+1);
+const warnings=[],miss=missingPrereq(keys,learned);
+Object.keys(miss).forEach(k=>warnings.push('「'+LIB[k].name+'」建議先掌握:'+miss[k].map(x=>LIB[x].name).join('、')+'。已在示範階段加入重溫'+(level==='beginner'?',並建議考慮先改選基礎主題':'')+'。'));
+const pa=pairAdvice(keys);if(pa)warnings.push(pa);
+if(n>15&&coaches===1)warnings.push('16–20人由一位教練帶領:建議邀請熟悉持靶的幹事協助;未能確認持靶安全的組別先空擊。');
+const fmt=s=>FORMAT_POOL[(s+Math.floor(r()*FORMAT_POOL.length))%FORMAT_POOL.length];
+const task=(field,s)=>{
+ if(ts.length===1){const i=idx(ts[0],s);return '['+tag(i)+'] '+ts[0][field][i];}
+ if(s!==segments-1){const t=ts[s];const i=idx(t,s);return t.name+' ['+tag(i)+']:'+t[field][i];}
+ const a=idx(ts[0],s),b=idx(ts[1],s);
+ return '串連練習:先做「'+ts[0].name+' '+tag(a)+':'+ts[0][field][a]+'」,回防、站穩重設,再做「'+ts[1].name+' '+tag(b)+':'+ts[1][field][b]+'」。先分開做好,再連接';
+};
+const equip=(field,setup)=>[row(setup,field==='bag'?'教練示範、分配沙包及確認安全間距。':'教練示範持靶、低力度試靶,逐組確認安全後開始。')].concat(Array.from({length:segments},(_,s)=>row(6,'第'+(s+1)+'段:'+task(field,s)+'。形式:'+fmt(s)+'。含下列輪換及休息。')));
+const per=ts.length===1?4:2;
+let fit=uniq(flat(ts.map(t=>shuffle(t.fitness,r).slice(0,per))));
+if(fit.length<4){const rest=shuffle(uniq(flat(ts.map(t=>t.fitness))).filter(x=>fit.indexOf(x)<0),r);fit=fit.concat(rest);}
+fit=fit.slice(0,4);
+const reviewParts=[];
+Object.keys(miss).forEach(k=>miss[k].forEach(p=>reviewParts.push(LIB[p].name+'('+LIB[p].basic+')')));
+(o.reviewKeys||[]).forEach(k=>{if(LIB[k]&&keys.indexOf(k)<0)reviewParts.push('上週內容「'+LIB[k].name+'」:'+LIB[k].basic);});
+const reviewText=reviewParts.length?'重溫:'+uniq(reviewParts).join(';')+'。再說明本課目標。':'重溫站姿、護手及本課學習目標。';
+const timed=(m,f)=>ts.map(t=>row(m/ts.length,t.name+':'+t[f]));
+const warmGen=WARM_POOL[Math.floor(r()*WARM_POOL.length)];
+const rows=[
+[row(1,'確認身體狀態、介紹搭檔。'),row(long?3:2,warmGen+'。'),row(long?4:2,'踝、髖、胸椎與肩胛動態活動。')].concat(timed(long?4:3,'warm')),
+[row(2,reviewText)].concat(timed(long?6:4,'demo'),[row(long?6:5,'分組無接觸練習:'+(long?'3循環':'2循環＋1分鐘教練回饋')+',每循環2分鐘。二人組每人45秒＋30秒回饋;三人組每人30秒＋30秒回饋;四人組分成兩對,同步練習。'),row(long?2:1,'飲水並按編號前往沙包。')]),
+equip('bag',2),equip('pads',long?4:2),
+[row(1,'示範四個動作及低強度版本。')].concat(fit.map(x=>row(long?2:1,x+':'+(long?'2回合':'1回合')+' × 45秒動作＋15秒恢復;新手改30秒動作＋30秒恢復。')),[row(long?3:1,'慢走、飲水、調整呼吸並準備緩和。')]),
+ts.map(t=>row((long?3:2)/ts.length,t.name+':'+t.check+' 搭檔記錄通過次數,教練統計通過人數比例。')),
+[row(long?2:1,'慢走與自然呼吸,逐漸降低活動量。'),row(2,'輕柔伸展小腿、大腿前側及胸肩;每側約15–20秒,不彈震。'),row(1,'各組同步分享:每人說一個學習重點與一個給搭檔的肯定。')]
+];
+const tips=['鏡像或影子拳練習由一人領路,其餘跟隨,每分鐘換領路者,保持無接觸距離。',ts.map(t=>t.name+':'+t.cue).join(' '),'每個沙包同時只容許一人擊打,其餘人在指定安全區空擊或觀察。每人輪流,完成一輪再循環;下一段重新由第一人開始。','按組內編號輪流打靶,下一位負責持靶,其餘觀察／空擊。不向頭部拍靶。未通過持靶檢查的小組先空擊,待教練指導。','全班按動作次序同步進行;保持空間,不以力竭為目標。','評估目的是決定下堂難度,不是排名。請課後在「課後回饋」輸入各主題通過比例。','以呼吸及放鬆為主,避免突然停止活動。'];
+const rotHtml=(groups,label)=>uniq(groups.map(g=>g.length)).sort().map(s=>{const x=rotation(s,segments);return s+'人組:每6分鐘每人輪'+x.rounds+'次,每次'+Math.round(x.work)+'秒練習＋'+x.rest+'秒休息／換人;全環節累計約'+timeText(x.hitting)+label+'。';});
+let elapsed=0;
+const blocks=STAGES.map((st,i)=>{const start=elapsed,minutes=rows[i].reduce((s,x)=>s+x.minutes,0);elapsed+=minutes;
+ const b={title:st[0],en:st[1],start:start,end:elapsed,minutes:minutes,rows:rows[i],cue:tips[i],rot:i===2?rotHtml(bagGroups,'沙包輪值練習(含主題空擊)'):i===3?rotHtml(padGroups,'打靶'):[],levels:[]};
+ if(i>=1&&i<=3){b.levels=ts.map(t=>{const lv0=base(t);return [t.name+' · 起始 '+tag(lv0),'基礎:'+t.basic,level==='beginner'?'鞏固:維持基礎版本,請搭檔按觀察指標回饋。':'進階:'+t.advanced];});}
+ return b;});
+if(Math.abs(elapsed-duration)>1e-6)throw Error('時間校驗失敗:總和 '+elapsed+' ≠ '+duration);
+return{keys:keys,ts:ts,n:n,coaches:coaches,level:level,duration:duration,segments:segments,seed:seed,padGroups:padGroups,bagGroups:bagGroups,blocks:blocks,warnings:warnings,fit:fit,total:elapsed,cats:uniq(ts.map(t=>t.cat))};
+}
+/*CORE_END*/
+const $=id=>document.getElementById(id);
+const KEY='boxinglab.v4';
+const MIG={straight:['jab','cross'],defense:['guard','backstep','slip'],footwork:['fwd','side'],combination:['combo']};
+let mem={learned:[],progress:{},history:[]};
+let storageOK=true;
+function migrate(){
+ const L=[];(mem.learned||[]).forEach(k=>{if(MIG[k])MIG[k].forEach(x=>L.push(x));else if(LIB[k])L.push(k);});mem.learned=uniq(L);
+ const P={};Object.keys(mem.progress||{}).forEach(k=>{const v=mem.progress[k];if(MIG[k])MIG[k].forEach(x=>P[x]=v);else if(LIB[k])P[k]=v;});mem.progress=P;
+ if(!Array.isArray(mem.history))mem.history=[];
+}
+function load(){try{const s=localStorage.getItem(KEY);if(s)mem=Object.assign(mem,JSON.parse(s));}catch(e){storageOK=false;}migrate();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(mem));}catch(e){storageOK=false;showStorage();}}
+function showStorage(){$('storage-note').textContent=storageOK?'':'提示:此瀏覽器不允許儲存記錄(例如私隱模式或受限環境)。請用「匯出學習記錄」自行保存。';}
+load();
+const fp=m=>String(+m.toFixed(1)).padStart(2,'0');
+function catHtml(inner){
+ return Object.keys(CATS).map(c=>{const ci=CATS[c];
+  const items=Object.keys(LIB).filter(k=>LIB[k].cat===c);
+  return '<div class="cat"><div class="cathead"><b>'+c+'</b>'+ci.label+'<small>'+ci.en+' · '+ci.desc+'</small></div><div class="catgrid">'+items.map(k=>inner(k,LIB[k])).join('')+'</div></div>';
+ }).join('');
+}
+$('topics').innerHTML=catHtml((k,t)=>'<label><input type="checkbox" name="topic" value="'+k+'"><span>'+t.icon+' '+t.name+'</span><small>L'+t.lv+'</small><span class="topic-state"></span></label>');
+$('week').innerHTML='<option value="0">自訂主題</option>'+WEEKS.map((w,i)=>'<option value="'+(i+1)+'">第'+(i+1)+'週:'+w.map(k=>LIB[k].name).join(' + ')+'</option>').join('');
+function renderLearned(){$('learned').innerHTML=catHtml((k,t)=>'<label><input type="checkbox" name="learned" value="'+k+'" '+(mem.learned.indexOf(k)>=0?'checked':'')+'><span>'+t.name+'</span></label>');}
+renderLearned();
+$('learned').addEventListener('change',()=>{mem.learned=[].slice.call(document.querySelectorAll('[name=learned]:checked')).map(e=>e.value);save();});
+const selected=()=>[].slice.call(document.querySelectorAll('[name=topic]:checked')).map(e=>e.value);
+function updateSelection(){const c=selected().length;[].forEach.call(document.querySelectorAll('[name=topic]'),el=>{el.disabled=c===2&&!el.checked;const l=el.parentElement;l.classList.toggle('is-selected',el.checked);l.classList.toggle('is-disabled',el.disabled);l.querySelector('.topic-state').textContent=el.checked?'✓':'';});$('selection-note').textContent='已選 '+c+'/2 項'+(c===0?' · 請至少選一項':c===2?' · 取消一項後可更換':'');}
+$('topics').addEventListener('change',()=>{$('week').value='0';updateSelection();});
+$('week').addEventListener('change',()=>{const w=+$('week').value;if(!w)return;[].forEach.call(document.querySelectorAll('[name=topic]'),e=>{e.checked=WEEKS[w-1].indexOf(e.value)>=0;});$('seed').value=w;updateSelection();render();});
+let last=null;
+const currentWeek=()=>+$('week').value;
+function render(){
+ let p;const w=currentWeek();
+ let learned=mem.learned.slice(),reviewKeys=[];
+ if(w>0){WEEKS.slice(0,w-1).forEach(ws=>ws.forEach(k=>learned.push(k)));if(w>1)reviewKeys=WEEKS[w-2];}
+ try{p=buildPlan({keys:selected(),n:Number($('people').value),coaches:Number($('coaches').value),level:$('level').value,duration:Number($('duration').value),seed:Number($('seed').value)||1,progress:mem.progress,learned:uniq(learned),reviewKeys:reviewKeys});}
+ catch(e){$('selection-note').textContent=e.message;return;}
+ last=p;
+ $('plan-title').textContent=p.ts.map(t=>t.name).join(' ＋ ')+' · 主題訓練';
+ $('objective').textContent=p.ts.map(t=>t.goal).join(' ');
+ $('total-duration').textContent=p.total;$('group-count').textContent=p.padGroups.length+' 組';$('week-label').textContent=w?'第 '+w+' 週':'自訂';
+ $('cat-label').textContent=p.cats.map(c=>CATS[c].label).join(' + ');
+ $('summary').textContent=p.n+'位學員 · '+p.coaches+'位教練 · '+p.bagGroups.length+'/8個沙包 · '+p.padGroups.length+'/5對手靶 · 非接觸訓練 · 變化種子 '+p.seed;
+ $('warnings').innerHTML=p.warnings.map(x=>'<div class="warn">⚠ '+x+'</div>').join('');
+ const cols=['#e5383b','#f5b942','#3ecf8e','#4cc9f0','#a78bfa','#fb7185','#94a3b8'];
+ $('strip').innerHTML=p.blocks.map((b,i)=>'<i style="width:'+(b.minutes/p.total*100)+'%;background:'+cols[i]+'" title="'+b.title+' '+b.minutes+'分鐘"></i>').join('');
+ $('timeline').innerHTML=p.blocks.map((b,i)=>'<details class="card" open><summary><span class="no">0'+(i+1)+'</span><span class="tt">'+b.title+'<small>'+b.en+'</small></span><span class="tm">'+fp(b.start)+'–'+fp(b.end)+' MIN · '+(+b.minutes.toFixed(1))+' 分鐘</span></summary><div class="body"><ul class="rows">'+b.rows.map(x=>'<li><b>'+timeText(x.minutes)+'</b><span>'+x.text+'</span></li>').join('')+'</ul>'+(b.rot.length?'<div class="rot">'+b.rot.map(x=>'<div>'+x+'</div>').join('')+'</div>':'')+'<div class="cue">教練提示:'+b.cue+'</div>'+(b.levels.length?'<div class="lv">'+b.levels.map(l=>'<div><em>'+l[0]+'</em>'+l[1]+'<br>'+l[2]+'</div>').join('')+'</div>':'')+'</div></details>').join('');
+ const half=a=>Math.ceil(a.length/2);
+ $('staffing').textContent=(p.coaches===1?'1位教練:統一口令,全班同時練同一段;優先巡視新手及持靶。':'2位教練:教練A負責沙包組 1–'+half(p.bagGroups)+' 與手靶組 1–'+half(p.padGroups)+';教練B負責其餘小組。主教練帶節奏,另一位協助新手。')+' 編號按點名順序分配,教練可依程度及持靶能力調整。';
+ $('groups').innerHTML='<h4>手靶分組</h4><div class="chips">'+p.padGroups.map((g,i)=>'<span class="chip">第'+(i+1)+'組 · '+g.join(' / ')+'號</span>').join('')+'</div><h4>沙包分組</h4><div class="chips">'+p.bagGroups.map((g,i)=>'<span class="chip">沙包'+(i+1)+' · '+g.join(' / ')+'號</span>').join('')+'</div>';
+ $('feedback').innerHTML=p.ts.map(t=>{const v=mem.progress[t.key]||0;return '<div class="fb"><span>'+t.name+'</span><select data-fb="'+t.key+'"><option value="hi">通過率 ≥80%</option><option value="mid">60–79%</option><option value="lo">&lt;60%</option></select><small class="note">目前調整:'+(v>0?'+':'')+v+'</small></div>';}).join('')+'<button type="button" id="savefb">儲存回饋</button>';
+ $('savefb').onclick=saveFeedback;
+ renderHistory();
+}
+function saveFeedback(){
+ if(!last)return;const res=[];
+ [].forEach.call(document.querySelectorAll('[data-fb]'),s=>{const k=s.dataset.fb,v=s.value;const cur=mem.progress[k]||0;
+  if(v==='hi'){mem.progress[k]=clamp(cur+1,-1,1);if(mem.learned.indexOf(k)<0)mem.learned.push(k);}
+  else if(v==='lo'){mem.progress[k]=clamp(cur-1,-1,1);}
+  res.push(LIB[k].name+':'+(v==='hi'?'≥80%':v==='mid'?'60–79%':'<60%'));});
+ mem.history.unshift({date:new Date().toLocaleDateString('zh-HK'),week:currentWeek(),topics:last.ts.map(t=>t.name).join('+'),dur:last.duration,n:last.n,res:res.join('、')});
+ mem.history=mem.history.slice(0,10);save();renderLearned();
+ $('fbmsg').textContent='已儲存。下次生成同主題課表時會自動調整難度。';renderHistory();
+}
+function renderHistory(){$('history').innerHTML=mem.history.length?'<table><tr><th>日期</th><th>週次</th><th>主題</th><th>時長</th><th>人數</th><th>結果</th></tr>'+mem.history.map(h=>'<tr><td>'+h.date+'</td><td>'+(h.week||'-')+'</td><td>'+h.topics+'</td><td>'+h.dur+'</td><td>'+h.n+'</td><td>'+h.res+'</td></tr>').join('')+'</table>':'<span class="note">暫無記錄。</span>';}
+$('builder').addEventListener('submit',e=>{e.preventDefault();render();});
+$('print').addEventListener('click',()=>{const closed=[].slice.call(document.querySelectorAll('details.card:not([open])'));closed.forEach(d=>d.open=true);window.addEventListener('afterprint',()=>closed.forEach(d=>d.open=false),{once:true});window.print();});
+$('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(mem,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='boxing-lab-records.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);});
+$('importBtn').addEventListener('click',()=>$('importFile').click());
+$('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{try{const d=JSON.parse(fr.result);if(typeof d!=='object'||d===null)throw Error('格式不正確');mem=Object.assign({learned:[],progress:{},history:[]},d);migrate();save();renderLearned();render();$('testout').textContent='已匯入學習記錄。';}catch(err){$('testout').textContent='匯入失敗:'+err.message;}};fr.readAsText(f);e.target.value='';});
+$('reset').addEventListener('click',()=>{if(confirm('確定清除所有學習記錄?')){mem={learned:[],progress:{},history:[]};save();renderLearned();render();}});
+$('selftest').addEventListener('click',()=>{let ok=0,bad=0,msg='';const ks=Object.keys(LIB);const combos=ks.map(k=>[k]);for(let i=0;i<ks.length;i++)for(let j=i+1;j<ks.length;j++)combos.push([ks[i],ks[j]]);
+ combos.forEach(c=>[60,90].forEach(d=>['beginner','mixed','experienced'].forEach(l=>[5,9,12,20].forEach(n=>[1,2].forEach(co=>{try{const p=buildPlan({keys:c,n:n,coaches:co,level:l,duration:d,seed:3,learned:[]});if(Math.abs(p.total-d)<1e-6)ok++;else bad++;}catch(e){bad++;msg=e.message;}})))));
+ $('testout').textContent='測試 '+(ok+bad)+' 組:通過 '+ok+',失敗 '+bad+(msg?' · '+msg:'');});
+document.querySelector('[name=topic][value=jab]').checked=true;
+document.querySelector('[name=topic][value=guard]').checked=true;
+showStorage();updateSelection();render();
+</script>
+</body>
+</html>
